@@ -1,0 +1,48 @@
+﻿@model URLShortnerMVC.Models.ShortURLModel
+
+@{
+    ViewData["Title"] = "Welcome to to URLShortner";
+}
+
+<h1>Welcome to to URLShortner</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="ShortenURL">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="originalURL" class="control-label"></label>
+                <input asp-for="originalURL" class="form-control" />
+                <span asp-validation-for="originalURL" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="shortURL" class="control-label"></label>
+                <div class="form-group form-inline" style="width:400px";>
+                    <label>@ViewBag.currentdomain</label>
+                    <input asp-for="shortURL" class="form-control" />
+                    <span asp-validation-for="shortURL" class="text-danger"></span>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+            @if (ViewBag.ShortenURLSuccess != null)
+            {
+                @if (ViewBag.ShortenURLSuccess)
+                {
+                    <a href="@ViewBag.shortlink">Success, click here to redirect to @ViewBag.shortlink</a>
+                }
+                @if (!ViewBag.ShortenURLSuccess)
+                {
+                    <div class="error" style="width: 400px";>Could not create link, the custom link most likely already exists.</div>
+                }
+            }
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
