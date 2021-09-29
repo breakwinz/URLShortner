@@ -14,11 +14,11 @@ namespace DataLibrary.Logic
         private static int minLengthOfShortLink = 4;
         private static int maxLengthOfShortLink = 10;
 
-        private readonly IURLShortnerDBRepository _uRLShortnerDBRepository;
+        private readonly IURLShortnerDBRepository uRLShortnerDBRepository;
 
-        public ShortUrlProcessor(IURLShortnerDBRepository shortUrlDBRepository)
+        public ShortUrlProcessor(IURLShortnerDBRepository uRLShortnerDBRepository)
         {
-            _uRLShortnerDBRepository = shortUrlDBRepository;
+            this.uRLShortnerDBRepository = uRLShortnerDBRepository;
         }
 
         /// <summary>
@@ -38,12 +38,13 @@ namespace DataLibrary.Logic
             {
                 shortUrl = shortUrl
             };
-            var recordsFetched = _uRLShortnerDBRepository.LoadOriginalURLFromShortURL(data);
+            var recordsFetched = uRLShortnerDBRepository.LoadOriginalURLFromShortURL(data);
             if (recordsFetched.Count == 1)
             {
                 UpdateClickCount(shortUrl);
+                return recordsFetched.First().originalUrl;
             }
-            return recordsFetched.First().originalUrl;
+            return null;
         }
 
         /// <summary>
@@ -56,9 +57,9 @@ namespace DataLibrary.Logic
             {
                 shortUrl = shortUrl
             };
-            _uRLShortnerDBRepository.IncrementClicksFromShortUrl(data);
+            uRLShortnerDBRepository.IncrementClicksFromShortUrl(data);
         }
-    
+
         /// <summary>
         /// Creates a record for a new shortUrl entry
         /// </summary>
@@ -86,7 +87,7 @@ namespace DataLibrary.Logic
                 clicks = 0,
                 created = DateTime.Now,
             };
-            var rowsAffected = _uRLShortnerDBRepository.InsertNewRecord(newData);
+            var rowsAffected = uRLShortnerDBRepository.InsertNewRecord(newData);
             if(rowsAffected == 0)
             {
                 return new Tuple<bool, string>(false, shortUrl);
@@ -116,7 +117,7 @@ namespace DataLibrary.Logic
             {
                 shortUrl = shortUrl
             };
-            var recordsFetched = _uRLShortnerDBRepository.LoadOriginalURLFromShortURL(data);
+            var recordsFetched = uRLShortnerDBRepository.LoadOriginalURLFromShortURL(data);
             if (recordsFetched.Count > 0)
             {
                 return true;
@@ -139,7 +140,7 @@ namespace DataLibrary.Logic
                 shortUrl = generatedShortUrl
             };
 
-            while (_uRLShortnerDBRepository.LoadOriginalURLFromShortURL(data).Count > 0)
+            while (uRLShortnerDBRepository.LoadOriginalURLFromShortURL(data).Count > 0)
             {
                 generatedShortUrl = RandomString(lengthOfShortUrl, random);
             }
