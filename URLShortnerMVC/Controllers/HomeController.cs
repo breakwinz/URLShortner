@@ -33,15 +33,15 @@ namespace URLShortnerMVC.Controllers
                 Tuple<bool, string> response = _shortUrlProcessor.CreateShortURL(model.originalURL, model.shortURL);
                 if (response.Item1)
                 {
-                    ViewBag.ShortenURLSuccess = true;           
-                    ViewBag.shortlink = ViewBag.currentdomain + response.Item2;
+                    TempData["success"] = true;
+                    TempData["shortlink"] = ViewBag.currentdomain + response.Item2;
                 }
                 else
                 {
-                    ViewBag.ShortenURLSuccess = false;
+                    TempData["success"] = false;
                 }
             }
-            return View();
+            return RedirectToAction("ShortenURL");
         }
 
         [HttpGet]
@@ -49,6 +49,14 @@ namespace URLShortnerMVC.Controllers
         public IActionResult ShortenURL(string id)
         {
             ViewBag.currentdomain = GetCurrentAbsoluteURL();
+
+            if (TempData["success"] != null) // Checks if it has come here from a redirection from post
+            {
+                ViewBag.ShortenURLSuccess = TempData["success"];
+                ViewBag.shortlink = TempData["shortlink"];
+                return View();
+            }
+
             if (id == null)
             {
                 return View();
