@@ -1,36 +1,30 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 using URLShortnerMVC.Models;
-using Microsoft.AspNetCore.Http;
 using DataLibrary.Interfaces;
 
 
 namespace URLShortnerMVC.Controllers
 {
     public class HomeController : Controller
-    {
-        private readonly ILogger<HomeController> _logger;
-        private IShortUrlProcessor _shortUrlProcessor;
+    { 
+        private readonly IShortUrlProcessor _shortUrlProcessor;
 
-        public HomeController(ILogger<HomeController> logger, IShortUrlProcessor shortUrlProcessor)
+        public HomeController(IShortUrlProcessor shortUrlProcessor)
         {
-            _logger = logger;
+
             _shortUrlProcessor = shortUrlProcessor;
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult ShortenURL(ShortURLModel model)
+        public ActionResult ShortenUrl(ShortUrlModel model)
         {
             if (ModelState.IsValid)
             {
-                ViewBag.currentdomain = GetCurrentAbsoluteURL();
-                Tuple<bool, string> response = _shortUrlProcessor.CreateShortURL(model.originalURL, model.shortURL);
+                ViewBag.currentdomain = GetCurrentAbsoluteUrl();
+                Tuple<bool, string> response = _shortUrlProcessor.CreateShortUrl(model.originalURL, model.shortURL);
                 if (response.Item1)
                 {
                     TempData["success"] = true;
@@ -41,14 +35,14 @@ namespace URLShortnerMVC.Controllers
                     TempData["success"] = false;
                 }
             }
-            return RedirectToAction("ShortenURL");
+            return RedirectToAction("ShortenUrl");
         }
 
         [HttpGet]
         [Route("{*id}")]
-        public IActionResult ShortenURL(string id)
+        public IActionResult ShortenUrl(string id)
         {
-            ViewBag.currentdomain = GetCurrentAbsoluteURL();
+            ViewBag.currentdomain = GetCurrentAbsoluteUrl();
 
             if (TempData["success"] != null) // Checks if it has come here from a redirection from post
             {
@@ -62,15 +56,15 @@ namespace URLShortnerMVC.Controllers
                 return View();
             }
 
-            var originalURL = _shortUrlProcessor.GetOriginalURL(id);
-            if (originalURL == null)
+            var originalUrl = _shortUrlProcessor.GetOriginalUrl(id);
+            if (originalUrl == null)
             {
                 return Redirect("~/");
             }
-            return Redirect(originalURL);
+            return Redirect(originalUrl);
         }
 
-        public string GetCurrentAbsoluteURL()
+        public string GetCurrentAbsoluteUrl()
         {
             var absoluteUri = string.Concat(
                        HttpContext.Request.Scheme,
@@ -80,11 +74,6 @@ namespace URLShortnerMVC.Controllers
                        HttpContext.Request.Path.ToUriComponent(),
                        HttpContext.Request.QueryString.ToUriComponent());
             return absoluteUri;
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

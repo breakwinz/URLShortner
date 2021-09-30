@@ -1,13 +1,13 @@
-﻿using DataLibrary.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using DataLibrary.Models;
 
-namespace DataLibrary.DataAccess
+namespace DataLibrary.Interfaces
 {
-    public interface IURLShortnerDBRepository
+    public interface IUrlShortnerDbRepository
     {
         string GetConnectionString(string connectionName = "URLShortnerDB");
-        int IncrementClicksFromShortUrl(ShortURLModel shortURLModel);
-        int InsertNewRecord(ShortURLModel shortUrlModel);
-        List<ShortURLModel> LoadOriginalURLFromShortURL(ShortURLModel shortURLModel);
+        int IncrementClicksFromShortUrl(ShortUrlModel shortUrlModel);
+        int InsertNewRecord(ShortUrlModel shortUrlModel);
+        List<ShortUrlModel> LoadOriginalUrlFromShortUrl(ShortUrlModel shortUrlModel);
     }
 }

@@ -1,9 +1,9 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+// ReSharper disable InconsistentNaming
 
 namespace URLShortnerMVC.Models
 {
-    public class ShortURLModel
+    public class ShortUrlModel
     {
         [Display(Name = "Enter your long URL")]
         [Required(ErrorMessage = "You must enter a long URL!")]

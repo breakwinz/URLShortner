@@ -1,5 +1,3 @@
-using System;
-
 namespace URLShortnerMVC.Models
 {
     public class ErrorViewModel

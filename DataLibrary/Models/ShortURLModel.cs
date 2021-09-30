@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+// ReSharper disable InconsistentNaming
 
 namespace DataLibrary.Models
 {
-    public class ShortURLModel
+    public class ShortUrlModel
     {
         protected int id { get; set; }
         public string originalUrl { get; set; }

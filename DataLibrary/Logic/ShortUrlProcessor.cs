@@ -1,24 +1,20 @@
-﻿using DataLibrary.DataAccess;
-using DataLibrary.Models;
+﻿using DataLibrary.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DataLibrary.Interfaces;
 
 namespace DataLibrary.Logic
 {
     public class ShortUrlProcessor : IShortUrlProcessor
     {
-        private static int minLengthOfShortLink = 4;
-        private static int maxLengthOfShortLink = 10;
+        private const int MinLengthOfShortLink = 4;
+        private const int MaxLengthOfShortLink = 10;
 
-        private readonly IURLShortnerDBRepository uRLShortnerDBRepository;
+        private readonly IUrlShortnerDbRepository _uRlShortnerDbRepository;
 
-        public ShortUrlProcessor(IURLShortnerDBRepository uRLShortnerDBRepository)
+        public ShortUrlProcessor(IUrlShortnerDbRepository uRlShortnerDbRepository)
         {
-            this.uRLShortnerDBRepository = uRLShortnerDBRepository;
+            this._uRlShortnerDbRepository = uRlShortnerDbRepository;
         }
 
         /// <summary>
@@ -26,19 +22,19 @@ namespace DataLibrary.Logic
         /// </summary>
         /// <param name="shortUrl">shortUrl to filter by</param>
         /// <returns></returns>
-        public string GetOriginalURL(string shortUrl)
+        public string GetOriginalUrl(string shortUrl)
         {
             var lengthOfShortUrl = shortUrl.Length;
 
-            if (minLengthOfShortLink <= lengthOfShortUrl && lengthOfShortUrl >= maxLengthOfShortLink)
+            if (MinLengthOfShortLink <= lengthOfShortUrl && lengthOfShortUrl >= MaxLengthOfShortLink)
             {
                 return null;
             }
-            ShortURLModel data = new ShortURLModel
+            ShortUrlModel data = new ShortUrlModel
             {
                 shortUrl = shortUrl
             };
-            var recordsFetched = uRLShortnerDBRepository.LoadOriginalURLFromShortURL(data);
+            var recordsFetched = _uRlShortnerDbRepository.LoadOriginalUrlFromShortUrl(data);
             if (recordsFetched.Count == 1)
             {
                 UpdateClickCount(shortUrl);
@@ -53,11 +49,11 @@ namespace DataLibrary.Logic
         /// <param name="shortUrl"></param>
         public void UpdateClickCount(string shortUrl)
         {
-            ShortURLModel data = new ShortURLModel
+            ShortUrlModel data = new ShortUrlModel
             {
                 shortUrl = shortUrl
             };
-            uRLShortnerDBRepository.IncrementClicksFromShortUrl(data);
+            _uRlShortnerDbRepository.IncrementClicksFromShortUrl(data);
         }
 
         /// <summary>
@@ -66,11 +62,11 @@ namespace DataLibrary.Logic
         /// <param name="originalUrl">The originalUrl to store</param>
         /// <param name="shortUrl">The shortUrl to store</param>
         /// <returns></returns>
-        public Tuple<bool, string> CreateShortURL(string originalUrl, string shortUrl)
+        public Tuple<bool, string> CreateShortUrl(string originalUrl, string shortUrl)
         {
             originalUrl = ValidateSchemaOnURL(originalUrl);
 
-            if (CheckIfCustomURLExists(shortUrl))
+            if (CheckIfCustomUrlExists(shortUrl))
             {
                 return new Tuple<bool, string>(false, shortUrl);
             }
@@ -80,14 +76,14 @@ namespace DataLibrary.Logic
                 shortUrl = GenerateShortUrl();
             }
 
-            ShortURLModel newData = new ShortURLModel
+            ShortUrlModel newData = new ShortUrlModel
             {
                 originalUrl = originalUrl,
                 shortUrl = shortUrl,
                 clicks = 0,
                 created = DateTime.Now,
             };
-            var rowsAffected = uRLShortnerDBRepository.InsertNewRecord(newData);
+            var rowsAffected = _uRlShortnerDbRepository.InsertNewRecord(newData);
             if(rowsAffected == 0)
             {
                 return new Tuple<bool, string>(false, shortUrl);
@@ -111,13 +107,13 @@ namespace DataLibrary.Logic
         /// </summary>
         /// <param name="shortUrl"></param>
         /// <returns></returns>
-        public bool CheckIfCustomURLExists(string shortUrl)
+        public bool CheckIfCustomUrlExists(string shortUrl)
         {
-            ShortURLModel data = new ShortURLModel
+            ShortUrlModel data = new ShortUrlModel
             {
                 shortUrl = shortUrl
             };
-            var recordsFetched = uRLShortnerDBRepository.LoadOriginalURLFromShortURL(data);
+            var recordsFetched = _uRlShortnerDbRepository.LoadOriginalUrlFromShortUrl(data);
             if (recordsFetched.Count > 0)
             {
                 return true;
@@ -132,15 +128,15 @@ namespace DataLibrary.Logic
         private string GenerateShortUrl()
         {
             Random random = new Random();
-            var lengthOfShortUrl = random.Next(minLengthOfShortLink, maxLengthOfShortLink);
+            var lengthOfShortUrl = random.Next(MinLengthOfShortLink, MaxLengthOfShortLink);
             string generatedShortUrl = RandomString(lengthOfShortUrl, random);
 
-            ShortURLModel data = new ShortURLModel
+            ShortUrlModel data = new ShortUrlModel
             {
                 shortUrl = generatedShortUrl
             };
 
-            while (uRLShortnerDBRepository.LoadOriginalURLFromShortURL(data).Count > 0)
+            while (_uRlShortnerDbRepository.LoadOriginalUrlFromShortUrl(data).Count > 0)
             {
                 generatedShortUrl = RandomString(lengthOfShortUrl, random);
             }
